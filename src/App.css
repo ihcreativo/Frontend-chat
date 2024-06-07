@@ -1,0 +1,163 @@
+
+@import url("https://fonts.googleapis.com/css?family=Red+Hat+Display:400,500,900&display=swap");
+
+#caja-texto{
+    flex: bottom; 
+    background-color: #fcfcfc;
+    height: 100px;
+    vertical-align: middle;
+    position: absolute fixed;
+    left:50%;
+    bottom: 0;
+		margin-left:-25px;
+}
+#top-chat{
+  background-color: #fcfcfc;
+  height: 70px;
+  box-shadow: #ccc 1px 1px;
+}
+
+body, html, #contenedor {
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: #DEDEDE;
+}
+#top-user-onlive{
+  height: 70px;
+  font-size: x-large;
+  background-color: #031426 !important;
+  vertical-align: middle;
+  margin: 0;  
+  padding: 10px 0;
+  box-shadow: #313030 1px 1px;
+}
+
+#sticky{
+  background-color: #fcfcfc;
+  width: 75%;
+  height: 80px;
+  margin-bottom: 0;
+  border-radius: 20px 0 0 20px;
+  padding: 20px;
+}
+
+
+
+
+
+#user-onlive{
+  background-color: #041A31 !important;
+}
+
+
+#hidden{
+  display: none;
+}
+
+#root{
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.salida-chat{
+  height: 400px;
+  width: 100%;
+  overflow-y: auto !important;
+  padding: 10px 0;
+}
+#msn-foraneo{
+    /* background-color: aquamarine; */
+    background-color: white;
+    display: block;
+    padding: 13px 20px;
+    color: dimgrey;
+    border: aquamarine solid 1px;
+    border-radius: 0 20px 20px 0;
+    text-align: left;
+    padding: 13px 20px;
+    margin: 0px 20% 0px 0px;
+}
+#msn-fecha-foraneo{
+  font-size: x-small;
+  text-align: left;
+  padding-right: 5px;
+  margin: 10px 20% 0px 0;
+}
+
+#msn-propio{
+  /* background-color: cadetblue; */
+  background-color: #473B8A;
+  display: block;
+  padding: 13px 20px;
+  color: azure;
+  border: cadetblue solid 1px;
+  margin: 0px 0 0px 20%;
+  border-radius: 20px 0 0 20px;
+  text-align: left;
+}
+#msn-fecha-foraneo{
+  font-size: x-small;
+  text-align: left;
+  padding-left: 5px;
+  margin: 0px 20% 20px 0px;
+}
+#msn-fecha-propio{
+  font-size: x-small;
+  text-align: right;
+  padding-right: 5px;
+  margin: 0px 0px  20px 20%;
+}
+#title-propio{
+  text-align: center;
+  font-weight: 500;
+  display: block;
+  margin: 0px 0px  0px 20%;
+}
+
+#title-foraneo{
+  text-align: center;
+  font-weight: 500;
+  display: block;
+  margin: 0px 20% 0px  0px;
+}
+
+#space{
+  width: 20px !important;
+  display: inline-block;
+  text-align: center;
+}
+
+#users_connecteds{
+  height: 400px;
+  overflow-y: auto !important;
+  padding: 10px 0 !important;
+}
+
+#nickname{
+  margin: 0 15px 0 0;
+  padding: 0;
+}
+
+#nickname #nickname_title{
+  font-size: small;
+  display: block;
+  text-align: left;
+  padding: 0px !important;
+  margin: 0px;
+}
+#nickname #nickname_user{
+  display: block;
+  padding: 5px 0;
+  font-weight: 400;
+  text-align: left;
+}
+
+#close{
+  color: brown;
+  font-size: x-large;
+}
