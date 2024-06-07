@@ -1,5 +1,7 @@
 
 import { useState } from 'react';
+import '../App.css'
+
 //import '../App.css'
 
 function generateUUID () {
@@ -35,13 +37,18 @@ function Home() {
   }
   
   return (
-    <div>
-        <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Digite su NickName" 
-                onChange={(e) => setNickName(e.target.value)} 
-            />
-            <button>Acce</button>
-        </form> 
+    <div className='container' id='access'>
+        <div className='card py-5 px-5'>
+            <form  onSubmit={handleSubmit}>
+                <label htmlFor="">
+                  
+                </label>
+                <input className='form-control mb-5' type="text" required placeholder="Digite su Nickname..." 
+                    onChange={(e) => setNickName(e.target.value)} 
+                />
+                <button className='btn btn-primary'>Ingresar</button>
+            </form> 
+        </div>
     </div>
   )
 }

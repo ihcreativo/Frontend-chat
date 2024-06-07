@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import '../App.css'
 import io from 'socket.io-client'
-import { FaUser, FaPaperPlane, FaUsers, FaXmark} from 'react-icons/fa6';
+import { FaUser, FaUsers} from 'react-icons/fa6';
 
 
 const username = localStorage.getItem('NickName_IH');
@@ -17,75 +17,54 @@ const socket = io("/",{
   }
 });
 
+const permisoAlerta =() =>{
+  Notification.requestPermission().then(resultado => {
+    console.log('permiso', resultado);
+  })
+}
+
+const notificacion = (msn:any) => {
+  if(Notification.permission === 'granted'){
+     const nueva_notificacion = new Notification('Nuevo m;ensaje...',{
+
+     })
+     nueva_notificacion.onclick = function(){
+      window.open('http://localhost:5173');
+    }
+  }
+}
+
+
+
 
 let clientConnet :Object [];
 
-const lblOn  = document.querySelector('#online');
-const lblOff = document.querySelector('#offline');
+
 
 socket.on( 'connect', () =>{
   estado = true;
-  lblOff?.classList.add('hidden');
-  lblOn?.classList.remove('hidden');
+  permisoAlerta();
 
 
 })
 socket.on('disconnect', ()=> {
   estado = false;
-  lblOff?.classList.remove('hidden');
-  lblOn?.classList.add('hidden');
-
 })
 
 socket.on('on-clients-changed', (data) =>{
   clientConnet = data;
   console.log(clientConnet);
-  //renderUsuarios(data);
 });
 
 
 socket.on('welcome-message',msn =>{
- // alert(msn);
+  console.log(msn);
 });
 socket.on('msn-alerta-new-user', (msn) =>{
   console.log(msn +' se ha conectado...');
 
 })
 
-function renderUsuarios(payload:any){
-  // console.log('listado-----')
-  // console.log(payload);
-  // console.log('------------')
-  // const lista = document.querySelector('#lista');
-  // const {id, name } = payload;
-
-  // const divElement = document.createElement( 'li' );
-  // //divElement.classList.add( 'message' );
-  // let msn = `<li>${ name }</li>`;
-  // divElement.innerHTML = msn;
-  // lista?.appendChild( divElement );
-  // return (
-  //   <ul className='list-unstyled my-0 mx-4' id='users_connecteds'>
-  //     {payload.map((elm:any, index:any) =>(
-  //     <li key={index} className='py-3 px-0 mx-0 border-bottom'>
-  //       <div className='d-flex justify-content-between'>
-  //         <div className='d-flex flex-row'>
-  //           <div>
-  //             <FaUser width={40} />
-  //             <span className="badge bg-success badge-dot"></span>
-  //           </div>
-  //           <div className="pt-1">
-  //             <p className="fw-bold mb-0 px-3 text-white">{elm.name}</p>
-  //           </div>
-  //         </div>
-  //       </div>
-
-  //     </li>
-  //     ))}
-  //   </ul>
-  // )
-
-}
 
 const renderMessage = ( payload:any, adjunto = false ) => {
   const chat = document.querySelector('#chat');
@@ -97,6 +76,7 @@ const renderMessage = ( payload:any, adjunto = false ) => {
   let mensajero = name;
   let msn = '';
   if ( userId != socket.id ){
+     
       divElement.classList.add( 'incoming' );
       msn = ` <div id='title-foraneo'>${ mensajero }</div>
               <div id='msn-foraneo'>  ${ message } </div>`;
@@ -130,17 +110,14 @@ const renderMessage = ( payload:any, adjunto = false ) => {
     }
   }
   divElement.innerHTML = msn;
-  //divElement.innerHTML = `<small> ${ mensajero } <p>${ message }</p> </small>`;
-
+  
   chat?.appendChild( divElement );
-  //chat.scrollTop = chat.scrollHeight;
   chat?.lastElementChild?.scrollIntoView({behavior: 'smooth', block: 'end' });
-  //scroll al final de los mensajes
+  notificacion(msn);
 }
 
 
 socket.on('on-message', (data) =>{
-  // console.log({data});
    renderMessage(data, false);
 })
 
@@ -158,49 +135,32 @@ function Chat() {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     socket.emit('send-message',message);
-    //const btnn = document.querySelector('#input-msn').value = '';
     setMessage('');
     console.log(message)
   }
 
   
-  const handleFile = (e:any) => {
-    let file = e.target.files[0];
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function(evt) {
-     //socket.emit('upload-file',file);
-      socket.emit('upload-file',evt, (status:any) =>{
-        console.log(status, evt);
-      })
-    };
+  // const handleFile = (e:any) => {
+  //   let file = e.target.files[0];
+  //   let reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = function(evt) {
+  //    //socket.emit('upload-file',file);
+  //     socket.emit('upload-file',evt, (status:any) =>{
+  //       console.log(status, evt);
+  //     })
+  //   };
 
-    reader.onerror = function() {
-      console.log(reader.error);
-    };
-
-
-
-
-
-    // reader.onload = function(evt){
-    //   socket.emit('upload-file',evt, (status:any) =>{
-    //     alert('isaias')
-    //     console.log(status, evt);
-    //   })
-    // }
-    // socket.emit('upload-file', file, (status:any) =>{
-    //   console.log(status, file);
-    // })
-
-  }
+  //   reader.onerror = function() {
+  //     console.log(reader.error);
+  //   };
+  // }
 
   const Salida = ()=>{
     localStorage.removeItem('NickName_IH');
     localStorage.removeItem('id_IH');
     window.location.replace('/');
   }
-
 
   return (
 
@@ -237,7 +197,6 @@ function Chat() {
 
                   </div>
                   <div className="col-4">
-                      <button className='btn btn-danger' onClick={Salida}><FaXmark/></button>
                   </div>
                 </div>
               </div>
@@ -254,7 +213,7 @@ function Chat() {
                     </div>
                     <div className='col-4'>
                         <div className='text-end px-4 py-2'>
-                            <span className='btn btn-danger'>Desconectarse</span>
+                            <span className='btn btn-danger' onClick={Salida}>Desconectarse</span>
                         </div>
                     </div>
                 </div>
@@ -281,8 +240,6 @@ function Chat() {
         </div>
 
     </div>
-
-
   )
 }
 

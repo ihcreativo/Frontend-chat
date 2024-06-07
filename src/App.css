@@ -1,6 +1,11 @@
 
 @import url("https://fonts.googleapis.com/css?family=Red+Hat+Display:400,500,900&display=swap");
 
+#access{
+  margin: 10% auto;
+  width: 40%;
+}
+
 #caja-texto{
     flex: bottom; 
     background-color: #fcfcfc;
@@ -65,7 +70,7 @@ body, html, #contenedor {
 }
 
 .salida-chat{
-  height: 400px;
+  height: 450px;
   width: 100%;
   overflow-y: auto !important;
   padding: 10px 0;
@@ -145,6 +150,7 @@ body, html, #contenedor {
 
 #nickname #nickname_title{
   font-size: small;
+  
   display: block;
   text-align: left;
   padding: 0px !important;
