@@ -1,12 +1,14 @@
+
 import { useState } from 'react';
-import io from 'socket.io-client'
-import { FaUser, FaUsers, FaSignal} from 'react-icons/fa6';
 import '../App.css'
+import io from 'socket.io-client'
+import { FaUser, FaUsers} from 'react-icons/fa6';
+
 
 const username = localStorage.getItem('NickName_IH');
 const id = localStorage.getItem('id_IH');
 
-let estado = 'OffLive';
+let estado = false;
 
 const socket = io("/",{
   auth: {
@@ -32,21 +34,25 @@ const notificacion = (msn:any) => {
   }
 }
 
+
 let clientConnet :Object [];
 
+
 socket.on( 'connect', () =>{
-  estado = 'Onlive';
+  estado = true;
   permisoAlerta();
+
+
 })
 socket.on('disconnect', ()=> {
-  estado = 'OffLive';
+  estado = false;
 })
 
 socket.on('on-clients-changed', (data) =>{
-  clientConnet = data.filter((elm:any) => elm.name != username)
-
+  clientConnet = data;
   console.log(clientConnet);
 });
+
 
 socket.on('welcome-message',msn =>{
   console.log(msn);
@@ -56,17 +62,18 @@ socket.on('msn-alerta-new-user', (msn) =>{
 
 })
 
+
 const renderMessage = ( payload:any, adjunto = false ) => {
   const chat = document.querySelector('#chat');
-  const {userId, message, name, date, tipo, nickname_receptor } = payload;
+  const {userId, message, name, date } = payload;
 
   const divElement = document.createElement( 'div' );
   divElement.classList.add( 'message' );
   
   let mensajero = name;
-  if(tipo === 'private') mensajero = `${ name } [ En Privado  ]`;
   let msn = '';
   if ( userId != socket.id ){
+     
       divElement.classList.add( 'incoming' );
       msn = ` <div id='title-foraneo'>${ mensajero }</div>
               <div id='msn-foraneo'>  ${ message } </div>`;
@@ -83,8 +90,7 @@ const renderMessage = ( payload:any, adjunto = false ) => {
       }
   }else{
     mensajero = 'Yo';
-    if(tipo === 'private') mensajero = `Yo [ Privado con ${ nickname_receptor } ]`;
-    msn = `<div id='title-propio'>${ mensajero }</div>
+    msn = ` <div id='title-propio'>${ mensajero }</div>
             <div id='msn-propio'>  ${ message } </div>`;
     if(!adjunto){
     msn+= ` <div id='msn-fecha-propio'>
@@ -100,44 +106,24 @@ const renderMessage = ( payload:any, adjunto = false ) => {
       msn+= 'Descargar '+date.file;
     }
   }
-  divElement.innerHTML = msn; 
+  divElement.innerHTML = msn;
+  
   chat?.appendChild( divElement );
   chat?.lastElementChild?.scrollIntoView({behavior: 'smooth', block: 'end' });
-  //notificacion(msn);
+  notificacion(msn);
 }
 
-socket.on('on-message', (data) =>{
+
+socket.on('on-message_', (data) =>{
    renderMessage(data, false);
 })
-
-socket.on('msn-private', (data) =>{
-  console.log('mensaje privado');
-  console.log(data)
-  renderMessage(data, false);
-});
-
-const privateChat = (arg:any) =>{
-  
-  let msn = prompt('Digitar mensaje privado a '+arg.name);
-  if(msn != ""){
-    console.log(msn, arg.name);
-    socket.emit('ini-msn-private', {
-      'emisor': username,
-      'id_emisor': id,
-      'msn': msn,
-      'receptor':arg.name,
-      'id_receptor':arg.id,
-    })
-  }
-}
 
 socket.on('file-send', (data) =>{
     console.log(data);
     renderMessage(data, true)
 })
 
-function Chat() {
-
+function ChatRoom() {
   if(!username){
       window.location.replace('/');
       throw new Error('Username  requerido');
@@ -150,26 +136,50 @@ function Chat() {
     console.log(message)
   }
 
+  
+  // const handleFile = (e:any) => {
+  //   let file = e.target.files[0];
+  //   let reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = function(evt) {
+  //    //socket.emit('upload-file',file);
+  //     socket.emit('upload-file',evt, (status:any) =>{
+  //       console.log(status, evt);
+  //     })
+  //   };
+
+  //   reader.onerror = function() {
+  //     console.log(reader.error);
+  //   };
+  // }
+
   const Salida = ()=>{
     localStorage.removeItem('NickName_IH');
     localStorage.removeItem('id_IH');
+    socket.off("/").close();
+    socket.disconnected;
     window.location.replace('/');
   }
 
-  return (
-    <div id='contenedor'>
+  const privateChat = (arg:any) =>{
+    
+  }
 
+  return (
+
+    <div id='contenedor'>
         <div className='row'>
             <div className='col-3 pe-0 me-0'>
               <div className='vh-100 text-white' id='user-onlive'>
                 <div id='top-user-onlive'>
                   Usuarios Onlive
                 </div>
+                 <ul id='lista'></ul>
                 <ul className='list-unstyled my-0 mx-4' id='users_connecteds'>
                   {clientConnet?.map((elm:any, index) =>(
-                  <li key={index} className='py-3 px-0 mx-0 border-bottom' id='items' onClick={() => privateChat(elm)}>
-                    <div className='d-flex justify-content-between ps-3'>
-                      <div className='d-flex flex-row' >
+                  <li key={index} className='py-3 px-0 mx-0 border-bottom'>
+                    <div className='d-flex justify-content-between'>
+                      <div className='d-flex flex-row' onClick={() => privateChat(elm)}>
                         <div>
                           <FaUser width={40} />
                           <span className="badge bg-success badge-dot"></span>
@@ -179,18 +189,17 @@ function Chat() {
                         </div>
                       </div>
                     </div>
+
                   </li>
                   ))}
                 </ul>
                 <div className='row' id='nickname'>
                   <div className="col-8">
                     <span id='nickname_title'>NickName: </span>
-                    <span id='nickname_user'>
-                      {socket.auth.name} 
-                    </span>
+                    <span id='nickname_user'>{socket.auth.name}   { estado }</span>
+
                   </div>
                   <div className="col-4">
-                    <span id='nickname_title'> <FaSignal /> { estado } </span>
                   </div>
                 </div>
               </div>
@@ -232,9 +241,9 @@ function Chat() {
                 </div>
             </div>
         </div>
-       
-    </div>   
+
+    </div>
   )
 }
 
-export default Chat
+export default ChatRoom

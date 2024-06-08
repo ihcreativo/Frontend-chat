@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Chat from "./components/Chat"
+import Chat from "./components/Chat";
+import ChatRoom from "./components/ChatRoom";
 import Home from "./components/Home";
 import {
   BrowserRouter as Router,
@@ -10,6 +11,7 @@ const App = () => {
   let routes = useRoutes([
     { path: "/", element: <Home /> },
     { path: "chat", element: <Chat /> },
+    { path: "chatRoom", element: <ChatRoom /> },
     // ...
   ]);
   return routes;
