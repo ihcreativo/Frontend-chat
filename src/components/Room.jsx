@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { FaPeopleGroup, FaFolderOpen } from 'react-icons/fa6';
 
 export const Room = ({setRoom}) => {
   const room_disponibles = [
@@ -8,6 +9,8 @@ export const Room = ({setRoom}) => {
     {'room':'Sala 3', 'id':'sala_3', 'show':false},
     {'room':'Sala 4', 'id':'sala_4', 'show':false},
   ]
+  const {room, id, show} = room_disponibles;
+
   let room_active = 'sala_general';
   const get_room = (arg) =>{
     room_active = arg;
@@ -30,9 +33,9 @@ export const Room = ({setRoom}) => {
       Array.from(room_disponibles).map((e, i) => {
         return(
             <div className='form-control' 
-                id={e.show? 'room_active':'room'} 
+                id='room' 
                 onClick={() =>get_room(e.id)}  key={i}>
-                {e.room}
+                <FaPeopleGroup  /> {e.room}
             </div>
         )
       })

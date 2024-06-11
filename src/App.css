@@ -3,9 +3,9 @@
 
 #general_off{font-size: small; text-align: center; font-style: italic; 
   text-decoration:underline;}
-#room_active{background-color: #031426; color: #DEDEDE;}
-#room{cursor: pointer;}
-#room:hover{background-color: #473B8A; color: #ccc;}
+#room_active{background-color:none; color: #031426; border: none;}
+#room{cursor: pointer; color: #fff; margin: 0 5px; border-radius: 5px; background-color: #031426;} 
+#room:hover{background-color:#DEDEDE; color: #031426; font-weight: 500;}
 
 #items{cursor: pointer;}
 #items:hover{background-color: #031426;}
@@ -83,11 +83,11 @@ body, html, #contenedor {
 
 #msn-foraneo{
     /* background-color: aquamarine; */
-    background-color: white;
+    background-color: #cad1d1b1;
     display: block;
     padding: 13px 20px;
-    color: dimgrey;
-    border: rgb(69, 71, 69) solid 1px;
+    color: #313030;
+    border: #cad1d1b1 solid 1px;
     border-radius: 0 20px 20px 0;
     text-align: left;
     padding: 13px 20px;
@@ -102,11 +102,10 @@ body, html, #contenedor {
 
 #msn-propio{
   /* background-color: cadetblue; */
-  background-color: #473B8A;
+  background-color: #041A31;
   display: block;
   padding: 13px 20px;
   color: azure;
-  border: cadetblue solid 1px;
   margin: 0px 0 0px 20%;
   border-radius: 20px 0 0 20px;
   text-align: left;
