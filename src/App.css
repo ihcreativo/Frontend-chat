@@ -1,6 +1,12 @@
 
 @import url("https://fonts.googleapis.com/css?family=Red+Hat+Display:400,500,900&display=swap");
 
+#general_off{font-size: small; text-align: center; font-style: italic; 
+  text-decoration:underline;}
+#room_active{background-color: #031426; color: #DEDEDE;}
+#room{cursor: pointer;}
+#room:hover{background-color: #473B8A; color: #ccc;}
+
 #items{cursor: pointer;}
 #items:hover{background-color: #031426;}
 
@@ -22,11 +28,10 @@
 #top-chat{
   background-color: #fcfcfc;
   height: 70px;
-  box-shadow: #ccc 1px 1px;
 }
 
 body, html, #contenedor {
-  padding: 0 !important;
+  padding: 5px 4% !important;
   margin: 0 !important;
   background-color: #DEDEDE;
 }
@@ -49,12 +54,9 @@ body, html, #contenedor {
   padding: 20px;
 }
 
-
-
-
-
 #user-onlive{
   background-color: #041A31 !important;
+  height: 100%;
 }
 
 
@@ -73,11 +75,12 @@ body, html, #contenedor {
 }
 
 .salida-chat{
-  height: 450px;
+  height: 330px;
   width: 100%;
   overflow-y: auto !important;
   padding: 10px 0;
 }
+
 #msn-foraneo{
     /* background-color: aquamarine; */
     background-color: white;

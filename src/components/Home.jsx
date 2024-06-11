@@ -1,8 +1,5 @@
-
 import { useState } from 'react';
 import '../App.css'
-
-//import '../App.css'
 
 function generateUUID () {
   var d = new Date().getTime();
@@ -21,10 +18,9 @@ function Home() {
       throw new Error('Username  requerido');
   }
 
-  
   const [nickname, setNickName] = useState('');
   
-  const handleSubmit = (e:any) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     //const name = input.value;
     if ( nickname ) {

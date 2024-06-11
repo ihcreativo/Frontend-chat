@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import io from 'socket.io-client'
-import { FaUser, FaUsers, FaSignal} from 'react-icons/fa6';
-import '../App.css'
+import {ListaUsuarios}  from './ListaUsuarios'
+import { Room } from './Room'
+import { FaUser, FaUsers, FaSignal} from 'react-icons/fa6'
+//import '../App.css'
 
 const username = localStorage.getItem('NickName_IH');
 const id = localStorage.getItem('id_IH');
-
-let estado = 'OffLive';
 
 const socket = io("/",{
   auth: {
@@ -21,7 +21,7 @@ const permisoAlerta =() =>{
   })
 }
 
-const notificacion = (msn:any) => {
+const notificacion = (msn) => {
   if(Notification.permission === 'granted'){
      const nueva_notificacion = new Notification('Nuevo m;ensaje...',{
 
@@ -31,34 +31,35 @@ const notificacion = (msn:any) => {
     }
   }
 }
+const Salida = ()=>{
+  localStorage.removeItem('NickName_IH');
+  localStorage.removeItem('id_IH');
+  window.location.replace('/');
+}
 
-let clientConnet :Object [];
+const privateChat = (arg) =>{
+  let msn = prompt('Digitar mensaje privado a '+arg.name);
+  if(msn != ""){
+    console.log(msn, arg.name);
+    socket.emit('ini-msn-private', {
+      'emisor': username,
+      'id_emisor': id,
+      'msn': msn,
+      'receptor':arg.name,
+      'id_receptor':arg.id,
+    })
+  }
+}
 
-socket.on( 'connect', () =>{
-  estado = 'Onlive';
-  permisoAlerta();
-})
-socket.on('disconnect', ()=> {
-  estado = 'OffLive';
-})
-
-socket.on('on-clients-changed', (data) =>{
-  clientConnet = data.filter((elm:any) => elm.name != username)
-
-  console.log(clientConnet);
+socket.on('msn-private', (data) =>{
+  console.log('mensaje privado');
+  console.log(data)
+  renderMessage(data, false);
 });
 
-socket.on('welcome-message',msn =>{
-  console.log(msn);
-});
-socket.on('msn-alerta-new-user', (msn) =>{
-  console.log(msn +' se ha conectado...');
-
-})
-
-const renderMessage = ( payload:any, adjunto = false ) => {
+const renderMessage = ( payload, adjunto = false ) => {
   const chat = document.querySelector('#chat');
-  const {userId, message, name, date, tipo, nickname_receptor } = payload;
+  const {userId, message, name, date, tipo, room, nickname_receptor } = payload;
 
   const divElement = document.createElement( 'div' );
   divElement.classList.add( 'message' );
@@ -103,94 +104,107 @@ const renderMessage = ( payload:any, adjunto = false ) => {
   divElement.innerHTML = msn; 
   chat?.appendChild( divElement );
   chat?.lastElementChild?.scrollIntoView({behavior: 'smooth', block: 'end' });
+
   //notificacion(msn);
 }
 
-socket.on('on-message', (data) =>{
-   renderMessage(data, false);
-})
 
-socket.on('msn-private', (data) =>{
-  console.log('mensaje privado');
-  console.log(data)
-  renderMessage(data, false);
-});
-
-const privateChat = (arg:any) =>{
-  
-  let msn = prompt('Digitar mensaje privado a '+arg.name);
-  if(msn != ""){
-    console.log(msn, arg.name);
-    socket.emit('ini-msn-private', {
-      'emisor': username,
-      'id_emisor': id,
-      'msn': msn,
-      'receptor':arg.name,
-      'id_receptor':arg.id,
-    })
-  }
-}
-
-socket.on('file-send', (data) =>{
-    console.log(data);
-    renderMessage(data, true)
-})
 
 function Chat() {
+
+  const [clientConnet, setCLientConnet] = useState([])
+  const [messageAll, setMessageAll] = useState([])
+  const [estado, setEstado] = useState("OffLive");
+  const [room, setSala] = useState('Sala general');
+  const [roomid, setSalaid] = useState('sala_general')
+
+  socket.on('on-message', (data) =>{
+    setMessageAll([ ...messageAll, data]);
+    console.log(data);
+    onload();
+  })
+  
+  const setRoom = (arg) =>{
+    socket.emit('joinroom',
+    {
+      'room':arg.room,
+      'id':arg.id,
+      'room_close':room,
+      'room_id_close':roomid,
+    })
+    setSala(arg.room);
+    setSalaid(arg.id);
+  }
+  
+  socket.on('room_connect', (data) =>{
+    setMessageAll([ ...messageAll, data]);
+    console.log(data);
+  })
+  socket.on('room_close', (data) =>{
+    setMessageAll([ ...messageAll, data]);
+    console.log(data);
+  })
+  socket.on( 'connect', () =>{
+    setEstado('Onlive')
+  })
+
+  socket.on('disconnect', ()=> {
+    setEstado('OffLive');
+  })
+  
+  socket.on('welcome-message',msn =>{
+    console.log(msn);
+  });
+  
+  socket.on('msn-alerta-new-user', (msn) =>{
+    console.log(msn +' se ha conectado...');
+  })
+
+  socket.on('on-clients-changed', (data) =>{
+    setCLientConnet(data.filter((elm) => elm.name != username));
+  });
 
   if(!username){
       window.location.replace('/');
       throw new Error('Username  requerido');
   }
   const [message, setMessage] = useState('');
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     socket.emit('send-message',message);
     setMessage('');
     console.log(message)
   }
 
-  const Salida = ()=>{
-    localStorage.removeItem('NickName_IH');
-    localStorage.removeItem('id_IH');
-    window.location.replace('/');
+  const onload = () => {
+    setInterval(function(){if(window.parar)return;document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight},100);
   }
 
   return (
     <div id='contenedor'>
 
         <div className='row'>
+            
             <div className='col-3 pe-0 me-0'>
               <div className='vh-100 text-white' id='user-onlive'>
                 <div id='top-user-onlive'>
                   Usuarios Onlive
                 </div>
-                <ul className='list-unstyled my-0 mx-4' id='users_connecteds'>
-                  {clientConnet?.map((elm:any, index) =>(
-                  <li key={index} className='py-3 px-0 mx-0 border-bottom' id='items' onClick={() => privateChat(elm)}>
-                    <div className='d-flex justify-content-between ps-3'>
-                      <div className='d-flex flex-row' >
-                        <div>
-                          <FaUser width={40} />
-                          <span className="badge bg-success badge-dot"></span>
-                        </div>
-                        <div className="pt-1">
-                          <p className="fw-bold mb-0 px-3 text-white">{elm.name}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  ))}
-                </ul>
+                <div id='users_connecteds'>
+                    <ListaUsuarios dato={clientConnet}  privateChat={privateChat} />
+                </div>
+                
                 <div className='row' id='nickname'>
-                  <div className="col-8">
+                  <div className="col-8">  
                     <span id='nickname_title'>NickName: </span>
                     <span id='nickname_user'>
                       {socket.auth.name} 
                     </span>
                   </div>
                   <div className="col-4">
-                    <span id='nickname_title'> <FaSignal /> { estado } </span>
+                    <span id='nickname_title'> 
+                      <FaSignal /> 
+                      { estado } </span>
                   </div>
                 </div>
               </div>
@@ -202,16 +216,61 @@ function Chat() {
                             <FaUsers  className='rounded fs-1 border border-1 px-1'/>
                         </span>
                         <span className='px-3 fs-4 py-4 d-block-inline'>
-                            Sala de chat General
+                           {room}
                         </span>
                     </div>
+                    
                     <div className='col-4'>
                         <div className='text-end px-4 py-2'>
                             <span className='btn btn-danger' onClick={Salida}>Desconectarse</span>
                         </div>
                     </div>
+
                 </div>
-                <div id='chat' className='salida-chat'></div>
+                <Room setRoom={setRoom} />
+
+                <div className='salida-chat' id='chat'>
+                  {
+                    messageAll.map((elm, index) =>{
+                      return(
+                        <>
+                        { (elm.room  === roomid && (elm.tipo == 'public' || elm.tipo == 'private')) && 
+                        
+                        <div key={index}>
+                          <div id={(socket.id === elm.userId) ?'title-propio':'title-foraneo' }> 
+                              {elm.name}
+                          </div>
+                          <div id={(socket.id === elm.userId) ? 'msn-propio':'msn-foraneo'}> { elm.message } </div>
+                          <div id={(socket.id === elm.userId) ? 'msn-fecha-propio':'msn-fecha-foraneo'}>
+                            <span id='hora'>
+                              Hora { elm.date.hora} : { elm.date.minuto } : { elm.date.segundo }
+                            </span>
+                            <span id='space'>|</span>
+                            <span id='fecha'>
+                              { elm.date.dia_semana_letra.substring(0.3)}  { elm.date.dia } de { elm.date.mes_letra } de { elm.date.anio }
+                            </span>
+                          </div>
+                         
+                        </div>
+                         }
+                          
+                          { (elm.room  === roomid && (elm.tipo == 'general_off' || elm.tipo == 'general_on')) &&
+                         <div key={index}>
+                            <div id='general_off'> 
+                              {elm.message}
+                            </div>
+                          </div>
+                         }
+
+
+                        
+                        </>
+                      )
+                    })
+                  }
+         
+                </div>
+                
                 <div className='position-absolute bottom-0 end-0' id='sticky'>
                   <form onSubmit={handleSubmit}>
 
@@ -236,5 +295,4 @@ function Chat() {
     </div>   
   )
 }
-
 export default Chat
