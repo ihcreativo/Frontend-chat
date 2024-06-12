@@ -38,6 +38,7 @@ const notificacion = (msn) => {
 const Salida = ()=>{
   localStorage.removeItem('NickName_IH');
   localStorage.removeItem('id_IH');
+  socket.emit('off-socket', 'Desconectar');
   window.location.replace('/');
 }
 
