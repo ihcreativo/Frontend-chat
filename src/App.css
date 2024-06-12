@@ -14,7 +14,13 @@
   margin: 10% auto;
   width: 40%;
 }
-
+#btn-add{
+  margin: 0px;
+  padding: 3px !important;
+  font-size: 30pt;
+  cursor: pointer;
+  color: #0f3ae6e7;
+}
 #caja-texto{
     flex: bottom; 
     background-color: #fcfcfc;
@@ -78,7 +84,7 @@ body, html, #contenedor {
   height: 330px;
   width: 100%;
   overflow-y: auto !important;
-  padding: 10px 0;
+  padding: 10px 0 100px 0;
 }
 
 #msn-foraneo{

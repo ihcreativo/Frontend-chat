@@ -69,8 +69,8 @@ function Chat() {
     const [clientConnet, setCLientConnet] = useState([]);
     const [messageAll, setMessageAll] = useState([]);
     const [estado, setEstado] = useState("OffLive");
-    const [room, setSala] = useState('Sala general');
-    const [roomid, setSalaid] = useState('sala_general');
+    const [room, setSala] = useState('');
+    const [roomid, setSalaid] = useState('');
     const [alert_private, setAlertaPrivate] = useState('none');
     const [datos_private, setDatosPrivate] = useState({});
     
@@ -78,7 +78,7 @@ function Chat() {
     setMessageAll([ ...messageAll, data]);
     console.log('msn-public')
     console.log(data);
-    onload();
+    //onload();
     })
 
     socket.on('solicitud-chat-privated', (data) =>{
@@ -127,6 +127,24 @@ function Chat() {
         setSala(arg.room);
         setSalaid(arg.id);
     }
+    const crearRoom = () =>{
+        let sala = prompt ('Nombre de la sala a crear','');
+        if(sala != null && sala != ''){
+            if(confirm('Realmente dese crear '+sala+' como sala publica adicional')){
+                let id_room = generateID();
+                const data = {
+                    'create-room': true,
+                    'room':{
+                        'room': sala, 
+                        'id':id_room, 
+                        'tipo':'public', 
+                        'show':true,
+                    }
+                }
+                socket.emit('create-room-private', data)
+            }
+        }
+    }
     
     socket.on('room_connect', (data) =>{
         setMessageAll([ ...messageAll, data]);
@@ -167,13 +185,16 @@ function Chat() {
     const [message, setMessage] = useState('');
     const handleSubmit = (e) => {
         e.preventDefault();
+
         socket.emit('send-message',message);
         setMessage('');
         console.log(message)
+        onload();
     }
 
     const onload = () => {
-        setInterval(function(){if(window.parar)return;document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight},100);
+        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        //setInterval(function(){if(window.parar)return;document.getElementById('chat').scrollTop=document.getElementById('chat').scrollHeight},100);
     }
 
   return (
@@ -204,7 +225,19 @@ function Chat() {
                 </div>
               </div>
             </div>
-            <div className='col-lg-9 col-sm-12'>
+            {/* if panel inicio - seleccion de room */}
+            <div className={roomid != ''?'d-none':'col-lg-9 col-sm-12'} >
+                <div className='card vh-100'>
+                    <div className='card-body'>
+                        <div className="card.title">
+                            SELECCIONE UN SALA 
+                        </div>
+                        <Room datos={room_activas} setRoom={setRoom} addRoom={crearRoom} />
+                    </div>
+                </div>
+            </div>
+            {/* else Si ya hay seleccion de room */}
+            <div className={roomid == ''?'d-none':'col-lg-9 col-sm-12'} >  
               <div className='card'>
                 <div className='card-body'>
                 <div className='row px-0 mx-0' id='top-chat'>
@@ -224,7 +257,7 @@ function Chat() {
                         </div>
                     </div>
                   </div>
-                  <Room datos={room_activas} setRoom={setRoom} />
+                  <Room datos={room_activas} setRoom={setRoom} crearRoom={crearRoom}/>
                   </div>
                 </div>
                 {(alert_private != 'none') &&
