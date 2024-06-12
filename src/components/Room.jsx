@@ -6,10 +6,11 @@ export const Room = ({datos, setRoom, addRoom}) => {
   const nick = localStorage.getItem('NickName_IH');
   const idUser = localStorage.getItem('id_IH');
   
-  const get_room = (arg) =>{
+  const get_room = (arg, i) =>{
     datos.map((e) =>{
         if(e.id === arg){
             setRoom(e);
+            
         }else{
             e.show = false;
         } 

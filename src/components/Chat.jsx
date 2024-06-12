@@ -12,8 +12,12 @@ const socket = io("/",{
   auth: {
       'name': username,
       'id': id,
-  }
+  },
+  reconnectionDelay: 10000, // defaults to 1000
+  reconnectionDelayMax: 10000 // defaults to 5000
+
 });
+
 
 const permisoAlerta =() =>{
   Notification.requestPermission().then(resultado => {
@@ -75,9 +79,11 @@ function Chat() {
     const [datos_private, setDatosPrivate] = useState({});
     
     socket.on('on-message', (data) =>{
-    setMessageAll([ ...messageAll, data]);
-    console.log('msn-public')
-    console.log(data);
+        setMessageAll([ ...messageAll, data]);
+        console.log('msn-public')
+        console.log(data);
+         console.log('-----------')
+
     //onload();
     })
 
@@ -154,9 +160,17 @@ function Chat() {
         setMessageAll([ ...messageAll, data]);
         console.log(data);
     })
-    socket.on( 'connect', () =>{
+    socket.on('connect', () =>{
+        if (socket.recovered) {
+            socket.on('reconectar', (history) => {
+                setMessageAll(history);
+            })
+          } else {
+            console.log('new or unrecoverable session'); 
+          }
         setEstado('Onlive')
     })
+    
 
     socket.on('disconnect', ()=> {
         setEstado('OffLive');
@@ -199,8 +213,18 @@ function Chat() {
 
   return (
     <div id='contenedor'>
+        <div id='super' className={roomid != ''?'d-none':'col-lg-12 col-sm-12 py-5 my-5 px-5'}>
+            <div className='card'>
+                <div className='card-body'>
+                    <div className="card.title">
+                        SELECCIONE UN SALA 
+                    </div>
+                    <Room datos={room_activas} setRoom={setRoom} addRoom={crearRoom} />
+                </div>
+            </div>
+         </div>
 
-         <div className='row'>      
+         <div className={roomid == ''?'d-none':'row'}>      
             <div className='col-lg-3 col-sm-12'>
               <div className='card text-white' id='user-onlive'>
                 <div id='top-user-onlive'>
@@ -224,20 +248,9 @@ function Chat() {
                   </div>
                 </div>
               </div>
+            
             </div>
-            {/* if panel inicio - seleccion de room */}
-            <div className={roomid != ''?'d-none':'col-lg-9 col-sm-12'} >
-                <div className='card vh-100'>
-                    <div className='card-body'>
-                        <div className="card.title">
-                            SELECCIONE UN SALA 
-                        </div>
-                        <Room datos={room_activas} setRoom={setRoom} addRoom={crearRoom} />
-                    </div>
-                </div>
-            </div>
-            {/* else Si ya hay seleccion de room */}
-            <div className={roomid == ''?'d-none':'col-lg-9 col-sm-12'} >  
+            <div className='col-lg-9 col-sm-12'>  
               <div className='card'>
                 <div className='card-body'>
                 <div className='row px-0 mx-0' id='top-chat'>
@@ -257,14 +270,14 @@ function Chat() {
                         </div>
                     </div>
                   </div>
-                  <Room datos={room_activas} setRoom={setRoom} crearRoom={crearRoom}/>
+                  <Room datos={room_activas} setRoom={setRoom} addRoom={crearRoom}/>
                   </div>
                 </div>
                 {(alert_private != 'none') &&
-                <div class="alert alert-primary" role="alert">
+                <div class="alert alert-primary my-2 " role="alert">
                     {alert_private}
-                    <div className='input-group'>
-                    <span className='btn btn-primary' onClick={()=> aceptarPrivate()}>
+                    <div className=''>
+                    <span className='btn btn-primary mx-2' onClick={()=> aceptarPrivate()}>
                         Aceptar
                     </span>
                     <span className='btn btn-danger' onClick={() => setAlertaPrivate('none')}>
