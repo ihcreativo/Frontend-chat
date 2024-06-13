@@ -293,42 +293,41 @@ function Chat() {
                     {
                       messageAll.map((elm, i) =>{
                         return(
-                          <>
-                          {(elm.room  === roomid && (elm.tipo == 'public' || elm.tipo == 'private')) && 
-                          
                           <div key={i}>
-                            {elm.userId === socket.id &&
-                            <div id='title-propio'> 
-                                Yo
-                            </div>
-                            }
-                            {elm.userId != socket.id &&
-                            <div id='title-foraneo'> 
-                                {elm.name} 
-                            </div>
-                            }
-                            <div id={(socket.id === elm.userId) ? 'msn-propio':'msn-foraneo'}> { elm.message } </div>
-                            <div id={(socket.id === elm.userId) ? 'msn-fecha-propio':'msn-fecha-foraneo'}>
-                              <span id='hora'>
-                                Hora { elm.date.hora} : { elm.date.minuto } : { elm.date.segundo }
-                              </span>
-                              <span id='space'>|</span>
-                              <span id='fecha'>
-                                { elm.date.dia_semana_letra.substring(0.3)}  { elm.date.dia } de { elm.date.mes_letra } de { elm.date.anio }
-                              </span>
-                            </div>
-                          
-                          </div>
-                          }
+                            {(elm.room  === roomid && (elm.tipo == 'public' || elm.tipo == 'private')) && 
+                            <div>
+                                {elm.userId === socket.id &&
+                                <div id='title-propio'> 
+                                    Yo
+                                </div>
+                                }
+                                {elm.userId != socket.id &&
+                                <div id='title-foraneo'> 
+                                    {elm.name} 
+                                </div>
+                                }
+                                <div id={(socket.id === elm.userId) ? 'msn-propio':'msn-foraneo'}> { elm.message } </div>
+                                <div id={(socket.id === elm.userId) ? 'msn-fecha-propio':'msn-fecha-foraneo'}>
+                                <span id='hora'>
+                                    Hora { elm.date.hora} : { elm.date.minuto } : { elm.date.segundo }
+                                </span>
+                                <span id='space'>|</span>
+                                <span id='fecha'>
+                                    { elm.date.dia_semana_letra.substring(0.3)}  { elm.date.dia } de { elm.date.mes_letra } de { elm.date.anio }
+                                </span>
+                                </div>
                             
-                          { (elm.room  === roomid && (elm.tipo == 'general_off' || elm.tipo == 'general_on')) &&
-                          <div key={i}>
-                              <div id='general_off'> 
-                                {elm.message} 
-                              </div>
                             </div>
-                          } 
-                          </>
+                            }
+                                
+                            { (elm.room  === roomid && (elm.tipo == 'general_off' || elm.tipo == 'general_on')) &&
+                            <div key={i}>
+                                <div id='general_off'> 
+                                    {elm.message} 
+                                </div>
+                                </div>
+                            } 
+                          </div>
                         )
                       })
                     }
