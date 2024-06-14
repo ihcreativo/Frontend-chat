@@ -24,7 +24,7 @@ export const Room = ({datos, setRoom, addRoom}) => {
               {(elm.tipo == 'private' && (elm.user1 === nick || elm.user2 === nick)) &&
               <div className='bd-highlight px-3 py-2 my-1' 
                   id='room' 
-                  onClick={() =>getRoom(elm.id)}>
+                  onClick={() =>setRoom(elm)}>
                   <FaUserGroup /> VIP {(elm.user1 != nick)? elm.user1:elm.user2}
               </div>
               }
